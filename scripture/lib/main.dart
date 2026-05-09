@@ -43,7 +43,7 @@ class _ScriptureHomePageState extends State<ScriptureHomePage> {
   int _generationId = 0;
   static const Duration _wordDelay = Duration(milliseconds: 150);
   static const Duration _requestTimeout = Duration(seconds: 15);
-  static const String _liveurl = 'https://scriptures-b3jr.onrender.com/send'
+  static const String _liveurl = 'https://scriptures-b3jr.onrender.com/send';
   static const String _apiKey = 'Gagan_secure_cool_api_key_2026';
   String _backendUrl = _liveurl;
 
