@@ -43,19 +43,9 @@ class _ScriptureHomePageState extends State<ScriptureHomePage> {
   int _generationId = 0;
   static const Duration _wordDelay = Duration(milliseconds: 150);
   static const Duration _requestTimeout = Duration(seconds: 15);
-  static const String _myPcIp = '10.0.0.239';
-  String get _backendUrl {
-    if (kIsWeb) {
-      return 'http://localhost:8000/send';
-    }
-
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-        return 'http://$_myPcIp:8000/send';
-      default:
-        return 'http://localhost:8000/send';
-    }
-  }
+  static const String _liveurl = 'https://scriptures-b3jr.onrender.com/send'
+  static const String _apiKey = 'Gagan_secure_cool_api_key_2026';
+  String _backendUrl = _liveurl;
 
   Future<void> _generateVerse() async {
     _generationId++;
@@ -65,16 +55,21 @@ class _ScriptureHomePageState extends State<ScriptureHomePage> {
     });
 
     try {
-      final response = await http
-          .get(Uri.parse(_backendUrl))
-          .timeout(_requestTimeout);
-
+      final response = await http.get(
+        Uri.parse(_backendUrl),
+        headers: {
+          'x-api-key': _apiKey,
+          'Content-Type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final verse = data['message'] ?? 'No verse received.';
 
         await _showVerseWordByWord(verse);
-      } else {
+      }else if (response.statusCode == 403) {
+        setState(() => _scriptureText = 'Error: Unauthorized (API Key mismatch).');
+      }else {
         setState(() {
           _scriptureText = 'Error: Could not fetch verse (${response.statusCode}).';
         });
