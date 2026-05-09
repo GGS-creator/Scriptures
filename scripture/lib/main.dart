@@ -61,7 +61,7 @@ class _ScriptureHomePageState extends State<ScriptureHomePage> {
           'x-api-key': _apiKey,
           'Content-Type': 'application/json',
         },
-      ).timeout(const Duration(seconds: 30));
+      ).timeout(const Duration(seconds: 70));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final verse = data['message'] ?? 'No verse received.';
