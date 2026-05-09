@@ -1,0 +1,11 @@
+# Python artifacts
+__pycache__/
+*.pyc
+
+# Flutter build artifacts (huge files)
+scripture/build/
+scripture/.dart_tool/
+scripture/.packages
+
+# Secrets
+.env

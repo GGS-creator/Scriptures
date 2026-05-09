@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scripture</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #f0f4f8;
+      font-family: Georgia, serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      height: 92vh;
+      max-height: 860px;
+      width: 100%;
+      max-width: 460px;
+      background: #fff;
+      border: 2px solid #1A3A5C;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(26,58,92,0.13);
+    }
+
+    /* ── App Bar ── */
+    .app-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 20px;
+      border-bottom: 1.5px solid #1A3A5C;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .app-bar-icon {
+      width: 34px;
+      height: 34px;
+      background: #1A3A5C;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-bar-icon i { color: #fff; font-size: 18px; }
+
+    .app-title {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: 3.5px;
+      color: #1A3A5C;
+    }
+
+    /* ── Content ── */
+    .content-area {
+      flex: 1;
+      padding: 18px 18px 0 18px;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .verse-box {
+      flex: 1;
+      border: 2px solid #1A3A5C;
+      border-radius: 14px;
+      background: #fff;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .verse-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px 18px 52px 18px;
+      scrollbar-width: thin;
+      scrollbar-color: #1A3A5C transparent;
+    }
+
+    .verse-scroll::-webkit-scrollbar { width: 5px; }
+    .verse-scroll::-webkit-scrollbar-thumb {
+      background: #1A3A5C;
+      border-radius: 4px;
+    }
+    .verse-scroll::-webkit-scrollbar-track { background: transparent; }
+
+    .verse-text {
+      color: #1A3A5C;
+      font-size: 15.5px;
+      line-height: 1.85;
+      letter-spacing: 0.3px;
+      white-space: pre-wrap;
+      user-select: text;
+      min-height: 60px;
+    }
+
+    .verse-text.placeholder {
+      color: #7098b8;
+      font-style: italic;
+    }
+
+    /* ── Copy button ── */
+    .copy-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 13px;
+      border-radius: 20px;
+      border: 1px solid rgba(26,58,92,0.3);
+      background: rgba(26,58,92,0.07);
+      color: #1A3A5C;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      transition: background 0.15s;
+    }
+
+    .copy-btn:hover { background: rgba(26,58,92,0.15); }
+    .copy-btn i { font-size: 14px; }
+
+    /* ── Bottom ── */
+    .bottom-area {
+      padding: 22px 20px 24px 20px;
+      display: flex;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .generate-btn {
+      width: 200px;
+      height: 52px;
+      background: #1A3A5C;
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      font-family: Georgia, serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: opacity 0.2s, transform 0.1s;
+      box-shadow: 0 4px 14px rgba(26,58,92,0.28);
+    }
+
+    .generate-btn:hover:not(:disabled) { opacity: 0.87; transform: scale(1.02); }
+    .generate-btn:active:not(:disabled) { transform: scale(0.97); }
+    .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: #1A3A5C;
+      color: #fff;
+      padding: 10px 24px;
+      border-radius: 22px;
+      font-size: 13px;
+      font-family: Georgia, serif;
+      pointer-events: none;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+      z-index: 999;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- App Bar -->
+  <div class="app-bar">
+    <div class="app-bar-icon">
+      <i class="ti ti-book"></i>
+    </div>
+    <span class="app-title">SCRIPTURE</span>
+  </div>
+
+  <!-- Verse Box -->
+  <div class="content-area">
+    <div class="verse-box">
+      <div class="verse-scroll" id="verseScroll">
+        <p class="verse-text placeholder" id="verseText">
+          Tap "Generate" to receive a verse from the scripture.
+        </p>
+      </div>
+      <button class="copy-btn" onclick="copyVerse()">
+        <i class="ti ti-copy"></i> Copy
+      </button>
+    </div>
+  </div>
+
+  <!-- Generate Button -->
+  <div class="bottom-area">
+    <button class="generate-btn" id="generateBtn" onclick="generateVerse()">
+      Generate
+    </button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">Verse copied to clipboard</div>
+
+<script>
+  /* ─────────────────────────────────────────────────────
+     🔧 BACKEND URL — change this to point to your server
+     
+     Browser (localhost):       http://localhost:8000/send
+     Same WiFi / physical device: http://10.0.0.239:8000/send
+  ───────────────────────────────────────────────────── */
+  const BACKEND_URL = 'http://10.0.0.239:8000/send';
+  /* ───────────────────────────────────────────────────── */
+  const SECRET_KEY='Gagan_secure_cool_api_key_2026'
+  let isLoading = false;
+  let animInterval = null;
+
+  async function generateVerse() {
+    if (isLoading) return;
+    isLoading = true;
+
+    const btn = document.getElementById('generateBtn');
+    const verseEl = document.getElementById('verseText');
+
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div>';
+    verseEl.classList.remove('placeholder');
+    verseEl.textContent = '';
+
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+
+      const res = await fetch(BACKEND_URL, { signal: controller.signal });
+      clearTimeout(timeout);
+
+      if (!res.ok) throw new Error('Server returned ' + res.status);
+
+      const data = await res.json();
+      const verse = data.message || 'No verse received.';
+      await showWordByWord(verse);
+
+    } catch (err) {
+      verseEl.classList.add('placeholder');
+      if (err.name === 'AbortError') {
+        verseEl.textContent = 'Error: Server took too long to respond.\nMake sure FastAPI is running on port 8000.';
+      } else {
+        verseEl.textContent = 'Error: Could not connect to server.\n\nDetails: ' + err.message;
+      }
+    } finally {
+      isLoading = false;
+      btn.disabled = false;
+      btn.textContent = 'Generate';
+    }
+  }
+
+  function showWordByWord(text) {
+    return new Promise(resolve => {
+      const verseEl = document.getElementById('verseText');
+      const scroll = document.getElementById('verseScroll');
+      const words = text.split(' ');
+      let i = 0;
+      verseEl.textContent = '';
+      if (animInterval) clearInterval(animInterval);
+      animInterval = setInterval(() => {
+        if (i >= words.length) {
+          clearInterval(animInterval);
+          resolve();
+          return;
+        }
+        verseEl.textContent += (i === 0 ? '' : ' ') + words[i];
+        scroll.scrollTop = scroll.scrollHeight;
+        i++;
+      }, 55);
+    });
+  }
+
+  function copyVerse() {
+    const text = document.getElementById('verseText').textContent.trim();
+    if (!text || text.startsWith('Tap "Generate"')) return;
+    navigator.clipboard.writeText(text).then(showToast);
+  }
+
+  function showToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+  }
+</script>
+
+</body>
+</html>
